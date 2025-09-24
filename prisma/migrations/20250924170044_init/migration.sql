@@ -21,6 +21,7 @@ CREATE TABLE "public"."Meeting" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "shareLink" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -45,6 +46,7 @@ CREATE TABLE "public"."Participant" (
 -- CreateTable
 CREATE TABLE "public"."ActionItem" (
     "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "isCompleted" BOOLEAN NOT NULL DEFAULT false,
     "dueDate" TIMESTAMP(3),
@@ -70,6 +72,12 @@ CREATE TABLE "public"."MeetingNote" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Meeting_shareLink_key" ON "public"."Meeting"("shareLink");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Participant_userId_meetingId_key" ON "public"."Participant"("userId", "meetingId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "MeetingNote_meetingId_key" ON "public"."MeetingNote"("meetingId");

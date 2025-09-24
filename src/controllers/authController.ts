@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { LoginRequest, RegisterRequest } from '../models/User';
+import { LoginRequest, RegisterRequest, RegisterSchema, LoginSchema } from '../validations/User';
 
 export const login = (req: Request<{}, {}, LoginRequest>, res: Response) => {
   const { email, password } = req.body;
@@ -12,9 +12,10 @@ export const login = (req: Request<{}, {}, LoginRequest>, res: Response) => {
   });
 };
 
+
 export const register = (req: Request<{}, {}, RegisterRequest>, res: Response) => {
   const { email, password, name } = req.body;
-  
+
   console.log('Register attempt:', { email, password, name });
 
   res.json({

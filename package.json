@@ -21,6 +21,9 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
-    "express": "^5.1.0"
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "http-status-codes": "^2.3.0",
+    "zod": "^4.1.11"
   }
 }

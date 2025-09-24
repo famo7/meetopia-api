@@ -18,14 +18,15 @@ model User {
 
   createdMeetings   Meeting[]     @relation("UserCreatedMeetings")
   participants      Participant[]
-  assignedActions   ActionItem[]  @relation("AssignedActions")
-  assignedToActions ActionItem[]  @relation("AssignedToActions")
+  assignedActions   ActionItem[]  @relation("AssignedByUser")
+  assignedToActions ActionItem[]  @relation("AssignedToUser")
 }
 
 model Meeting {
   id          Int           @id @default(autoincrement())
   title       String
   description String
+  shareLink   String        @unique @default(uuid())
   date        DateTime      @default(now())
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -44,15 +45,19 @@ model Participant {
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   role      ParticipantRole @default(PARTICIPANT)
+  
   meetingId Int
   userId    Int
 
   user    User    @relation(fields: [userId], references: [id])
   meeting Meeting @relation(fields: [meetingId], references: [id])
+
+  @@unique([userId, meetingId])
 }
 
 model ActionItem {
   id          Int       @id @default(autoincrement())
+  title       String
   description String
   isCompleted Boolean   @default(false)
   dueDate     DateTime?
@@ -63,9 +68,8 @@ model ActionItem {
   assignedById Int
   assignedToId Int
 
-  assignedTo User @relation("AssignedToActions", fields: [assignedToId], references: [id])
-
-  assignedBy User    @relation("AssignedActions", fields: [assignedById], references: [id])
+  assignedTo User    @relation("AssignedToUser", fields: [assignedToId], references: [id])
+  assignedBy User    @relation("AssignedByUser", fields: [assignedById], references: [id])
   meeting    Meeting @relation(fields: [meetingId], references: [id])
 }
 

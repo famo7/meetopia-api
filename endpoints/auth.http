@@ -14,7 +14,11 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "john@example.com",
+  "email": "john@example2.com",
   "password": "Password123"
 }
+
+### Get Current User (Me)
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1ODg5MjExMiwiZXhwIjoxNzU4OTc4NTEyfQ.2Ufiu11bgnZPp2SKvgMUOQg_qQu5glOZ3Bq4G9Y92As
 

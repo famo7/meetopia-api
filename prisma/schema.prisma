@@ -55,13 +55,14 @@ model Participant {
 }
 
 model ActionItem {
-  id          Int       @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   title       String
   description String
-  isCompleted Boolean   @default(false)
+  isCompleted Boolean          @default(false)
+  status      ActionItemStatus @default(OPEN)
   dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   meetingId    Int
   assignedById Int
@@ -93,4 +94,10 @@ enum MeetingStatus {
   ACTIVE
   ENDED
   CANCELLED
+}
+
+enum ActionItemStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
 }

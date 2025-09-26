@@ -1,0 +1,35 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1ODg5OTMwOCwiZXhwIjoxNzU4OTg1NzA4fQ.gszRIdG6fbpug0nHTCzoJeOz7-DJRrEfp6XzR7Y4fWQ
+
+### Get all meetings
+GET http://localhost:3000/api/meetings
+Authorization: Bearer {{token}}
+
+### Get specific meeting
+GET http://localhost:3000/api/meetings/1
+Authorization: Bearer {{token}}
+
+### Create new meeting
+POST http://localhost:3000/api/meetings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Team Standup",
+  "description": "Daily standup meeting",
+  "date": "2024-01-15T10:00:00Z"
+}
+
+### Update meeting
+PUT http://localhost:3000/api/meetings/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Updated Meeting Title",
+  "description": "Updated description",
+  "status": "ACTIVE"
+}
+
+### Delete meeting
+DELETE http://localhost:3000/api/meetings/1
+Authorization: Bearer {{token}}

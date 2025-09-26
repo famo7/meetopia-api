@@ -77,3 +77,32 @@ export const register = async (req: Request<{}, {}, RegisterRequest>, res: Respo
   }
 
 };
+
+
+interface AuthRequest extends Request {
+  user?: {
+    userId: number;
+    email: string;
+  };
+}
+
+export const me = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: { id: true, email: true, name: true, createdAt: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch user" });
+  }
+};

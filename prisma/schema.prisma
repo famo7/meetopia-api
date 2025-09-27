@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdMeetings   Meeting[]     @relation("UserCreatedMeetings")
+  participants      Participant[]
+  assignedActions   ActionItem[]  @relation("AssignedByUser")
+  assignedToActions ActionItem[]  @relation("AssignedToUser")
+}
+
+model Meeting {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String
+  shareLink   String        @unique @default(uuid())
+  date        DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  status      MeetingStatus @default(SCHEDULED)
+
+  creatorId Int
+
+  creator      User          @relation("UserCreatedMeetings", fields: [creatorId], references: [id])
+  notes        MeetingNote?
+  participants Participant[]
+  actionItems  ActionItem[]
+}
+
+model Participant {
+  id        Int             @id @default(autoincrement())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  role      ParticipantRole @default(PARTICIPANT)
+
+  meetingId Int
+  userId    Int
+
+  user    User    @relation(fields: [userId], references: [id])
+  meeting Meeting @relation(fields: [meetingId], references: [id])
+
+  @@unique([userId, meetingId])
+}
+
+model ActionItem {
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String
+  isCompleted Boolean          @default(false)
+  status      ActionItemStatus @default(OPEN)
+  dueDate     DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  meetingId    Int
+  assignedById Int
+  assignedToId Int
+
+  assignedTo User    @relation("AssignedToUser", fields: [assignedToId], references: [id])
+  assignedBy User    @relation("AssignedByUser", fields: [assignedById], references: [id])
+  meeting    Meeting @relation(fields: [meetingId], references: [id])
+}
+
+model MeetingNote {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meetingId Int @unique
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+enum ParticipantRole {
+  PARTICIPANT
+  CREATOR
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum ActionItemStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+}

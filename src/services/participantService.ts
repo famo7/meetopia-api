@@ -1,0 +1,157 @@
+import prisma from '../lib/prisma';
+import { MeetingService } from './meetingService';
+import { USER_SELECT } from '../lib/prismaConstants';
+import { AddParticipantRequest } from '../validations/Participant';
+
+export class ParticipantService {
+  static async addParticipant(meetingId: number, userId: number, data: AddParticipantRequest) {
+    try {
+      const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
+      if (!meeting) {
+        throw { status: 404, message: "Meeting not found" };
+      }
+
+      const userExists = await prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { id: true }
+      });
+
+      if (!userExists) {
+        throw { status: 404, message: "User not found" };
+      }
+
+      const existingParticipant = await prisma.participant.findUnique({
+        where: {
+          userId_meetingId: {
+            userId: data.userId,
+            meetingId
+          }
+        }
+      });
+
+      if (existingParticipant) {
+        throw { status: 409, message: "User is already a participant in this meeting" };
+      }
+
+
+      const participant = await prisma.participant.create({
+        data: {
+          meetingId,
+          userId: data.userId,
+          role: data.role
+        },
+        include: {
+          user: { select: USER_SELECT }
+        }
+      });
+
+      return participant;
+
+    } catch (err: any) {
+      if (err.status) {
+        throw err;
+      }
+      console.error('Database error in addParticipant:', err);
+      throw { status: 500, message: "Internal server error" };
+    }
+  }
+
+  static async removeParticipant(meetingId: number, participantId: number, userId: number) {
+    try {
+      const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
+      if (!meeting) {
+        throw { status: 404, message: "Meeting not found or access denied" };
+      }
+
+      const participant = await prisma.participant.findUnique({
+        where: { id: participantId }
+      });
+
+      if (!participant) {
+        throw { status: 404, message: "Participant not found" };
+      }
+
+      if (participant.meetingId !== meetingId) {
+        throw { status: 400, message: "Participant does not belong to this meeting" };
+      }
+
+      await prisma.participant.delete({
+        where: { id: participantId }
+      });
+
+    } catch (err: any) {
+      if (err.status) {
+        throw err;
+      }
+      console.error('Database error in removeParticipant:', err);
+      throw { status: 500, message: "Internal server error" };
+    }
+  }
+
+  static async leaveAsParticipant(meetingId: number, userId: number) {
+    try {
+      const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
+      if (!meeting) {
+        throw { status: 404, message: "Meeting not found or access denied" };
+      }
+
+
+      const participant = await prisma.participant.findUnique({
+        where: {
+          userId_meetingId: {
+            userId,
+            meetingId
+          }
+        }
+      });
+
+      if (!participant) {
+        throw { status: 404, message: "You are not a participant in this meeting" };
+      }
+
+      await prisma.participant.delete({
+        where: { id: participant.id }
+      });
+
+    } catch (err: any) {
+      if (err.status) {
+        throw err;
+      }
+      console.error('Database error in leaveAsParticipant:', err);
+      throw { status: 500, message: "Internal server error" };
+    }
+  }
+
+  static async getParticipants(meetingId: number, userId: number) {
+    try {
+      const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
+      if (!meeting) {
+        throw { status: 404, message: "Meeting not found or access denied" };
+      }
+
+      const participants = await prisma.participant.findMany({
+        where: { meetingId },
+        include: {
+          user: { select: USER_SELECT }
+        },
+        orderBy: [
+          { role: 'asc' },
+          { user: { name: 'asc' } }
+        ]
+      });
+
+      return participants;
+
+    } catch (err: any) {
+      if (err.status) {
+        throw err;
+      }
+      console.error('Database error in getParticipants:', err);
+      throw { status: 500, message: "Internal server error" };
+    }
+  }
+}

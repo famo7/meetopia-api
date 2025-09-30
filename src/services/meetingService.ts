@@ -1,53 +1,10 @@
 import prisma from '../lib/prisma';
 import { CreateMeetingRequest, UpdateMeetingRequest } from '../validations/Meeting';
-
-
-const USER_SELECT = {
-  id: true,
-  name: true,
-  email: true
-} as const;
-
-const MEETING_INCLUDE = {
-  creator: { select: USER_SELECT },
-  participants: {
-    include: {
-      user: { select: USER_SELECT }
-    }
-  },
-  _count: {
-    select: {
-      participants: true,
-      actionItems: true
-    }
-  }
-} as const;
-
-const DETAILED_MEETING_INCLUDE = {
-  creator: { select: USER_SELECT },
-  participants: {
-    include: {
-      user: { select: USER_SELECT }
-    }
-  },
-  notes: true,
-  actionItems: {
-    include: {
-      assignedTo: { select: USER_SELECT }
-    }
-  }
-} as const;
-
-const getUserAccessCondition = (userId: number) => ({
-  OR: [
-    { creatorId: userId },
-    {
-      participants: {
-        some: { userId: userId }
-      }
-    }
-  ]
-});
+import {
+  MEETING_INCLUDE,
+  DETAILED_MEETING_INCLUDE,
+  getUserAccessCondition
+} from '../lib/prismaConstants';
 
 export class MeetingService {
   static async getUserMeetings(userId: number) {

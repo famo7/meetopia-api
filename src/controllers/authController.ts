@@ -29,9 +29,16 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response) =
       { expiresIn: '24h' }
     );
 
+
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
     return res.status(200).json({
       message: "Login successful",
-      token,
       user: {
         id: user.id,
         email: user.email,
@@ -105,4 +112,14 @@ export const me = async (req: AuthRequest, res: Response) => {
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch user" });
   }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+
+  res.json({ message: 'Logged out successfully' });
 };

@@ -34,36 +34,115 @@ async function main() {
     }
   });
 
-  console.log(`✅ Created users: ${user1.email}, ${user2.email}`);
+  const user3 = await prisma.user.create({
+    data: {
+      name: 'Test User 3',
+      email: 'test3@gmail.com',
+      passwordHash: hashedPassword
+    }
+  });
 
-  // Create one meeting
-  console.log('📅 Creating meeting...');
+  console.log(`✅ Created users: ${user1.email}, ${user2.email}, ${user3.email}`);
+
+  // Create meetings
+  console.log('📅 Creating meetings...');
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
   const meeting1 = await prisma.meeting.create({
     data: {
-      title: 'Test Meeting 1',
-      description: 'Test meeting created by user 1',
-      date: new Date('2025-02-01T10:00:00Z'),
+      title: 'Daily Standup',
+      description: 'Daily team standup meeting',
+      date: today,
       status: 'SCHEDULED',
       creatorId: user1.id
     }
   });
 
-  console.log(`✅ Created meeting: ${meeting1.title}`);
+  const meeting2 = await prisma.meeting.create({
+    data: {
+      title: 'Project Planning',
+      description: 'Planning session for new features',
+      date: tomorrow,
+      status: 'SCHEDULED',
+      creatorId: user2.id
+    }
+  });
+
+  console.log(`✅ Created meetings: ${meeting1.title}, ${meeting2.title}`);
+
+  // Add user3 as participant to both meetings
+  console.log('👥 Adding participants...');
+
+  await prisma.participant.create({
+    data: {
+      userId: user3.id,
+      meetingId: meeting1.id,
+      role: 'PARTICIPANT'
+    }
+  });
+
+  await prisma.participant.create({
+    data: {
+      userId: user3.id,
+      meetingId: meeting2.id,
+      role: 'PARTICIPANT'
+    }
+  });
+
+  console.log(`✅ Added User 3 as participant to both meetings`);
+
+  // Create action items assigned to user3
+  console.log('📋 Creating action items...');
+
+  const nextWeek = new Date(today);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+
+  const actionItem1 = await prisma.actionItem.create({
+    data: {
+      title: 'Review code changes',
+      description: 'Review pull requests for sprint 5',
+      status: 'OPEN',
+      dueDate: nextWeek,
+      meetingId: meeting1.id,
+      assignedById: user1.id,
+      assignedToId: user3.id
+    }
+  });
+
+  const actionItem2 = await prisma.actionItem.create({
+    data: {
+      title: 'Prepare presentation',
+      description: 'Prepare slides for project demo',
+      status: 'IN_PROGRESS',
+      dueDate: nextWeek,
+      meetingId: meeting2.id,
+      assignedById: user2.id,
+      assignedToId: user3.id
+    }
+  });
+
+  console.log(`✅ Created action items: ${actionItem1.title}, ${actionItem2.title}`);
 
   // Summary
   console.log('\n🎉 Database seeded successfully!');
   console.log('\n📊 Summary:');
-  console.log(`👥 Users: 2`);
-  console.log(`📅 Meetings: 1`);
+  console.log(`👥 Users: 3`);
+  console.log(`📅 Meetings: 2 (today and tomorrow)`);
+  console.log(`🤝 Participants: 2 (User 3 added to both meetings)`);
+  console.log(`📋 Action Items: 2 (both assigned to User 3)`);
 
   console.log('\n🔑 Test Login Credentials:');
-  console.log(`Email: test@gmail.com | Password: Password123`);
-  console.log(`Email: test2@gmail.com | Password: Password123`);
+  console.log(`Email: test@gmail.com | Password: Password123 (Meeting Creator)`);
+  console.log(`Email: test2@gmail.com | Password: Password123 (Meeting Creator)`);
+  console.log(`Email: test3@gmail.com | Password: Password123 (Participant with 2 action items)`);
 
-  console.log('\n📋 Test Data:');
-  console.log(`User 1 (${user1.email}) - Created Meeting ID: ${meeting1.id}`);
-  console.log(`User 2 (${user2.email}) - Can be added as participant manually`);
+  console.log('\n📋 Test Scenario:');
+  console.log(`User 1 (${user1.email}) - Created Meeting "${meeting1.title}" (today)`);
+  console.log(`User 2 (${user2.email}) - Created Meeting "${meeting2.title}" (tomorrow)`);
+  console.log(`User 3 (${user3.email}) - Participant in both meetings, 2 action items assigned`);
 }
 
 main()

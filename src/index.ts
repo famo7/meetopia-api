@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes';
 import meetingRoutes from './routes/meetingRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
 import { globalLimiter } from './middleware/ratelimit';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -24,6 +25,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/meetings', meetingRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

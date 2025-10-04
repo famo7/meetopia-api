@@ -18,8 +18,14 @@ export const CreateActionItemSchema = z.object({
     .optional()
     .default('OPEN'),
 
-  dueDate: z.iso.datetime('Due date must be a valid ISO 8601 datetime')
-    .refine((date) => new Date(date) > new Date(), {
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH'])
+    .optional()
+    .default('MEDIUM'),
+
+  dueDate: z.coerce.date()
+    .refine((date) => {
+      return date > new Date();
+    }, {
       message: 'Due date must be in the future'
     })
     .optional()
@@ -43,8 +49,13 @@ export const UpdateActionItemSchema = z.object({
   status: z.enum(['OPEN', 'IN_PROGRESS', 'DONE'])
     .optional(),
 
-  dueDate: z.iso.datetime('Due date must be a valid ISO 8601 datetime')
-    .refine((date) => new Date(date) > new Date(), {
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH'])
+    .optional(),
+
+  dueDate: z.coerce.date()
+    .refine((date) => {
+      return date > new Date();
+    }, {
       message: 'Due date must be in the future'
     })
     .optional()

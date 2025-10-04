@@ -60,6 +60,7 @@ model ActionItem {
   description String
   isCompleted Boolean          @default(false)
   status      ActionItemStatus @default(OPEN)
+  priority    Priority         @default(MEDIUM)
   dueDate     DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -100,4 +101,10 @@ enum ActionItemStatus {
   OPEN
   IN_PROGRESS
   DONE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
 }

@@ -36,6 +36,7 @@ export class ActionItemService {
         assignedById: userId,
         assignedToId: data.assignedToId ?? userId,
         status: 'OPEN',
+        priority: data.priority || 'MEDIUM',
         dueDate: data.dueDate ? new Date(data.dueDate) : null
       },
       include: {

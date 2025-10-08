@@ -1,4 +1,5 @@
 import express from 'express';
+import { createServer } from 'http';
 import 'dotenv/config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -7,9 +8,17 @@ import meetingRoutes from './routes/meetingRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import { globalLimiter } from './middleware/ratelimit';
 import { errorHandler } from './middleware/errorHandler';
+import { SocketService } from './services/socketService';
 
 const app = express();
 const port = 3000;
+
+// Create HTTP server
+const httpServer = createServer(app);
+
+// Initialize Socket.io
+const socketService = new SocketService(httpServer);
+console.log('🔌 Socket.io initialized');
 
 
 app.use(cors({
@@ -27,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/meetings', meetingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use(errorHandler);
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(`📡 WebSocket server ready for connections`);
 });

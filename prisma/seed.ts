@@ -107,7 +107,17 @@ async function main() {
     }
   });
 
-  console.log(`✅ Created meetings: ${meeting1.title}, ${meeting2.title}, ${meeting3.title}, ${meeting4.title}, ${meeting5.title}`);
+  const meeting6 = await prisma.meeting.create({
+    data: {
+      title: 'Collaborative Workshop',
+      description: 'Active workshop with all team members',
+      date: today,
+      status: 'ACTIVE',
+      creatorId: user3.id
+    }
+  });
+
+  console.log(`✅ Created meetings: ${meeting1.title}, ${meeting2.title}, ${meeting3.title}, ${meeting4.title}, ${meeting5.title}, ${meeting6.title}`);
 
   // Add user3 as participant to all meetings
   console.log('👥 Adding participants...');
@@ -144,7 +154,24 @@ async function main() {
     }
   });
 
-  console.log(`✅ Added User 3 as participant to all meetings`);
+  // Add user1 and user2 as participants to meeting6 (created by user3)
+  await prisma.participant.create({
+    data: {
+      userId: user1.id,
+      meetingId: meeting6.id,
+      role: 'PARTICIPANT'
+    }
+  });
+
+  await prisma.participant.create({
+    data: {
+      userId: user2.id,
+      meetingId: meeting6.id,
+      role: 'PARTICIPANT'
+    }
+  });
+
+  console.log(`✅ Added User 3 as participant to 4 meetings, User 1 and User 2 as participants to meeting 6`);
 
   // Create action items assigned to user3
   console.log('📋 Creating action items...');
@@ -184,19 +211,19 @@ async function main() {
   console.log('\n🎉 Database seeded successfully!');
   console.log('\n📊 Summary:');
   console.log(`👥 Users: 3`);
-  console.log(`📅 Meetings: 5 (2 scheduled, 1 active, 1 ended, 1 cancelled)`);
-  console.log(`🤝 Participants: 4 (User 3 added to 4 meetings)`);
+  console.log(`📅 Meetings: 6 (2 scheduled, 2 active, 1 ended, 1 cancelled)`);
+  console.log(`🤝 Participants: 6 (User 3 in 4 meetings, User 1 & 2 in meeting 6)`);
   console.log(`📋 Action Items: 2 (both assigned to User 3)`);
 
   console.log('\n🔑 Test Login Credentials:');
-  console.log(`Email: test@gmail.com | Password: Password123 (Meeting Creator)`);
-  console.log(`Email: test2@gmail.com | Password: Password123 (Meeting Creator)`);
+  console.log(`Email: test@gmail.com | Password: Password123 (Meeting Creator + Participant)`);
+  console.log(`Email: test2@gmail.com | Password: Password123 (Meeting Creator + Participant)`);
   console.log(`Email: test3@gmail.com | Password: Password123 (Meeting Creator + Participant with 2 action items)`);
 
   console.log('\n📋 Test Scenario:');
-  console.log(`User 1 (${user1.email}) - Created "${meeting1.title}" (scheduled), "${meeting3.title}" (ended)`);
-  console.log(`User 2 (${user2.email}) - Created "${meeting2.title}" (scheduled), "${meeting4.title}" (cancelled)`);
-  console.log(`User 3 (${user3.email}) - Created "${meeting5.title}" (active), Participant in 4 meetings, 2 action items assigned`);
+  console.log(`User 1 (${user1.email}) - Created "${meeting1.title}" (scheduled), "${meeting3.title}" (ended), Participant in "${meeting6.title}"`);
+  console.log(`User 2 (${user2.email}) - Created "${meeting2.title}" (scheduled), "${meeting4.title}" (cancelled), Participant in "${meeting6.title}"`);
+  console.log(`User 3 (${user3.email}) - Created "${meeting5.title}" (active), "${meeting6.title}" (active), Participant in 4 meetings, 2 action items assigned`);
 }
 
 main()

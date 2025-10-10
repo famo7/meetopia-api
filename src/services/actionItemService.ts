@@ -85,8 +85,21 @@ export class ActionItemService {
         updateData.status = data.status;
       }
 
-      if (data.title !== undefined || data.description !== undefined || data.assignedToId !== undefined || data.dueDate !== undefined) {
-        throw { status: 403, message: "Assigned user can only update status" };
+      if (data.assignedToId !== undefined) {
+        const assignedToUser = await prisma.user.findUnique({
+          where: { id: data.assignedToId },
+          select: { id: true }
+        });
+
+        if (!assignedToUser) {
+          throw { status: 400, message: "Assigned user not found" };
+        }
+
+        updateData.assignedToId = data.assignedToId;
+      }
+
+      if (data.title !== undefined || data.description !== undefined || data.dueDate !== undefined || data.priority !== undefined) {
+        throw { status: 403, message: "Assigned user can only update status and reassign" };
       }
     }
 

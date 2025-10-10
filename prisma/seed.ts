@@ -173,12 +173,15 @@ async function main() {
 
   console.log(`✅ Added User 3 as participant to 4 meetings, User 1 and User 2 as participants to meeting 6`);
 
-  // Create action items assigned to user3
+  // Create action items - comprehensive test data
   console.log('📋 Creating action items...');
 
   const nextWeek = new Date(today);
   nextWeek.setDate(nextWeek.getDate() + 7);
+  const twoWeeks = new Date(today);
+  twoWeeks.setDate(twoWeeks.getDate() + 14);
 
+  // User 1 creates action items
   const actionItem1 = await prisma.actionItem.create({
     data: {
       title: 'Review code changes',
@@ -194,18 +197,124 @@ async function main() {
 
   const actionItem2 = await prisma.actionItem.create({
     data: {
+      title: 'Update documentation',
+      description: 'Update API documentation for new endpoints',
+      status: 'IN_PROGRESS',
+      priority: 'MEDIUM',
+      dueDate: nextWeek,
+      meetingId: meeting1.id,
+      assignedById: user1.id,
+      assignedToId: user2.id
+    }
+  });
+
+  const actionItem3 = await prisma.actionItem.create({
+    data: {
+      title: 'Fix critical bug',
+      description: 'Fix production bug in payment system',
+      status: 'DONE',
+      priority: 'HIGH',
+      dueDate: nextWeek,
+      meetingId: meeting1.id,
+      assignedById: user1.id,
+      assignedToId: user1.id // Self-assigned
+    }
+  });
+
+  // User 2 creates action items
+  const actionItem4 = await prisma.actionItem.create({
+    data: {
       title: 'Prepare presentation',
       description: 'Prepare slides for project demo',
       status: 'IN_PROGRESS',
       priority: 'MEDIUM',
-      dueDate: nextWeek,
+      dueDate: twoWeeks,
       meetingId: meeting2.id,
       assignedById: user2.id,
       assignedToId: user3.id
     }
   });
 
-  console.log(`✅ Created action items: ${actionItem1.title}, ${actionItem2.title}`);
+  const actionItem5 = await prisma.actionItem.create({
+    data: {
+      title: 'Design new feature',
+      description: 'Create mockups for user dashboard redesign',
+      status: 'OPEN',
+      priority: 'LOW',
+      dueDate: twoWeeks,
+      meetingId: meeting2.id,
+      assignedById: user2.id,
+      assignedToId: user1.id
+    }
+  });
+
+  const actionItem6 = await prisma.actionItem.create({
+    data: {
+      title: 'Setup testing environment',
+      description: 'Configure Jest and Playwright for testing',
+      status: 'IN_PROGRESS',
+      priority: 'HIGH',
+      dueDate: nextWeek,
+      meetingId: meeting2.id,
+      assignedById: user2.id,
+      assignedToId: user2.id // Self-assigned
+    }
+  });
+
+  // User 3 creates action items
+  const actionItem7 = await prisma.actionItem.create({
+    data: {
+      title: 'Deploy to staging',
+      description: 'Deploy latest changes to staging environment',
+      status: 'OPEN',
+      priority: 'HIGH',
+      dueDate: nextWeek,
+      meetingId: meeting6.id,
+      assignedById: user3.id,
+      assignedToId: user1.id
+    }
+  });
+
+  const actionItem8 = await prisma.actionItem.create({
+    data: {
+      title: 'Code review',
+      description: 'Review frontend components for accessibility',
+      status: 'IN_PROGRESS',
+      priority: 'MEDIUM',
+      dueDate: nextWeek,
+      meetingId: meeting6.id,
+      assignedById: user3.id,
+      assignedToId: user2.id
+    }
+  });
+
+  const actionItem9 = await prisma.actionItem.create({
+    data: {
+      title: 'Write unit tests',
+      description: 'Write unit tests for authentication service',
+      status: 'DONE',
+      priority: 'MEDIUM',
+      dueDate: nextWeek,
+      meetingId: meeting6.id,
+      assignedById: user3.id,
+      assignedToId: user3.id // Self-assigned
+    }
+  });
+
+  const actionItem10 = await prisma.actionItem.create({
+    data: {
+      title: 'Database optimization',
+      description: 'Optimize slow queries in meetings table',
+      status: 'OPEN',
+      priority: 'LOW',
+      dueDate: twoWeeks,
+      meetingId: meeting6.id,
+      assignedById: user3.id,
+      assignedToId: user1.id
+    }
+  });
+
+  console.log(`✅ Created ${10} action items with varied assignments`);
 
   // Summary
   console.log('\n🎉 Database seeded successfully!');
@@ -213,17 +322,20 @@ async function main() {
   console.log(`👥 Users: 3`);
   console.log(`📅 Meetings: 6 (2 scheduled, 2 active, 1 ended, 1 cancelled)`);
   console.log(`🤝 Participants: 6 (User 3 in 4 meetings, User 1 & 2 in meeting 6)`);
-  console.log(`📋 Action Items: 2 (both assigned to User 3)`);
+  console.log(`📋 Action Items: 10 (varied across all users)`);
 
   console.log('\n🔑 Test Login Credentials:');
-  console.log(`Email: test@gmail.com | Password: Password123 (Meeting Creator + Participant)`);
-  console.log(`Email: test2@gmail.com | Password: Password123 (Meeting Creator + Participant)`);
-  console.log(`Email: test3@gmail.com | Password: Password123 (Meeting Creator + Participant with 2 action items)`);
+  console.log(`Email: test@gmail.com | Password: Password123`);
+  console.log(`Email: test2@gmail.com | Password: Password123`);
+  console.log(`Email: test3@gmail.com | Password: Password123`);
 
-  console.log('\n📋 Test Scenario:');
-  console.log(`User 1 (${user1.email}) - Created "${meeting1.title}" (scheduled), "${meeting3.title}" (ended), Participant in "${meeting6.title}"`);
-  console.log(`User 2 (${user2.email}) - Created "${meeting2.title}" (scheduled), "${meeting4.title}" (cancelled), Participant in "${meeting6.title}"`);
-  console.log(`User 3 (${user3.email}) - Created "${meeting5.title}" (active), "${meeting6.title}" (active), Participant in 4 meetings, 2 action items assigned`);
+  console.log('\n📋 Action Items Breakdown:');
+  console.log(`User 1 - Created: 3 items | Assigned to them: 4 items`);
+  console.log(`User 2 - Created: 3 items | Assigned to them: 3 items`);
+  console.log(`User 3 - Created: 4 items | Assigned to them: 3 items`);
+  console.log('\n📊 Status Distribution:');
+  console.log(`OPEN: 4 items | IN_PROGRESS: 4 items | DONE: 2 items`);
+  console.log(`Priority: HIGH: 4 | MEDIUM: 4 | LOW: 2`);
 }
 
 main()

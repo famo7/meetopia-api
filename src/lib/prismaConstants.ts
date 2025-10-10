@@ -12,6 +12,13 @@ export const MEETING_INCLUDE = {
       user: { select: USER_SELECT }
     }
   },
+  actionItems: {
+    include: {
+      assignedBy: { select: USER_SELECT },
+      assignedTo: { select: USER_SELECT }
+    },
+    orderBy: { createdAt: 'desc' }
+  },
   _count: {
     select: {
       participants: true,

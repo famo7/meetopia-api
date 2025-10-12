@@ -75,3 +75,20 @@ export const deleteMeeting = async (req: AuthRequest, res: Response, next: NextF
     next(err);
   }
 };
+
+export const generateAgoraToken = async (req: AuthRequest, res: Response) => {
+  try {
+    const meetingId = parseInt(req.params.id);
+    const userId = req.user!.userId;
+
+    if (isNaN(meetingId)) {
+      return res.status(400).json({ message: "Invalid meeting ID" });
+    }
+
+    const tokenData = await MeetingService.generateAgoraToken(meetingId, userId);
+    res.status(200).json(tokenData);
+
+  } catch (error: any) {
+    res.status(error.status || 500).json({ message: error.message || "Failed to generate token" });
+  }
+};

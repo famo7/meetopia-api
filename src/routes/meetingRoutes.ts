@@ -4,7 +4,8 @@ import {
   getMeetingById,
   createMeeting,
   updateMeeting,
-  deleteMeeting
+  deleteMeeting,
+  generateAgoraToken
 } from '../controllers/meetingController';
 import { validateData } from '../middleware/validationMiddleware';
 import { CreateMeetingSchema, UpdateMeetingSchema } from '../validations/Meeting';
@@ -27,8 +28,10 @@ router.put('/:id', validateData(UpdateMeetingSchema), updateMeeting);
 
 router.delete('/:id', deleteMeeting);
 
+// Agora video token generation
+router.post('/:id/agora-token', generateAgoraToken);
+
 // Nested routes
-router.use('/:meetingId/action-items', actionItemRoutes);
 router.use('/:meetingId/participants', participantRoutes);
 
 export default router;

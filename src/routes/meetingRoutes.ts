@@ -33,5 +33,5 @@ router.post('/:id/agora-token', generateAgoraToken);
 
 // Nested routes
 router.use('/:meetingId/participants', participantRoutes);
-
+router.use('/:meetingId/action-items', actionItemRoutes);
 export default router;

@@ -163,13 +163,17 @@ export class ParticipantService {
         throw { status: 404, message: "Meeting not found or access denied" };
       }
 
-      // Get existing participant IDs to exclude them from search
+      // Get existing participant IDs and meeting creator to exclude them from search
       const existingParticipants = await prisma.participant.findMany({
         where: { meetingId },
         select: { userId: true }
       });
 
-      const excludeUserIds = existingParticipants.map(p => p.userId);
+      // Meeting creator is already in meeting, so exclude them too
+      const excludeUserIds = [
+        ...existingParticipants.map(p => p.userId),
+        meeting.creatorId
+      ];
 
       // Smart search: prioritize startsWith over contains for better precision
       const users = await prisma.user.findMany({

@@ -19,6 +19,10 @@ model User {
   participants      Participant[]
   assignedActions   ActionItem[]  @relation("AssignedByUser")
   assignedToActions ActionItem[]  @relation("AssignedToUser")
+
+  @@index([name, email], map: "idx_users_name_email")
+  @@index([email], map: "idx_users_email")
+  @@index([name], map: "idx_users_name")
 }
 
 model Meeting {

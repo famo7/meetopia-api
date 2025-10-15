@@ -52,3 +52,6 @@ temp/
 /generated/prisma
 
 endpoints/
+
+# CLAUDE.md
+CLAUDE.md

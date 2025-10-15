@@ -154,4 +154,59 @@ export class ParticipantService {
       throw { status: 500, message: "Internal server error" };
     }
   }
+
+  static async searchParticipants(meetingId: number, userId: number, query: string, limit: number = 10) {
+    try {
+      const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
+      if (!meeting) {
+        throw { status: 404, message: "Meeting not found or access denied" };
+      }
+
+      // Get existing participant IDs to exclude them from search
+      const existingParticipants = await prisma.participant.findMany({
+        where: { meetingId },
+        select: { userId: true }
+      });
+
+      const excludeUserIds = existingParticipants.map(p => p.userId);
+
+      // Smart search: prioritize startsWith over contains for better precision
+      const users = await prisma.user.findMany({
+        where: {
+          AND: [
+            { id: { notIn: excludeUserIds } },
+            {
+              OR: [
+                // Priority 1: Name starts with query (most relevant)
+                { name: { startsWith: query, mode: 'insensitive' } },
+                // Priority 2: Email starts with query
+                { email: { startsWith: query, mode: 'insensitive' } },
+                // Priority 3: Name contains query (for longer names)
+                { name: { contains: query, mode: 'insensitive' } },
+                // Priority 4: Email contains query (fallback)
+                { email: { contains: query, mode: 'insensitive' } }
+              ]
+            }
+          ]
+        },
+        select: USER_SELECT,
+        take: limit,
+        orderBy: [
+          // Prioritize startsWith matches by sorting name first
+          { name: 'asc' },
+          { email: 'asc' }
+        ]
+      });
+
+      return users;
+
+    } catch (err: any) {
+      if (err.status) {
+        throw err;
+      }
+      console.error('Database error in searchParticipants:', err);
+      throw { status: 500, message: "Internal server error" };
+    }
+  }
 }

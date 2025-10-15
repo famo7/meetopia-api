@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { ParticipantService } from '../services/participantService';
 import { AddParticipantRequest } from '../validations/Participant';
+import { SearchParticipantsRequest } from '../validations/Search';
 
 export const getParticipants = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
@@ -59,6 +60,44 @@ export const leaveAsMeeting = async (req: AuthRequest, res: Response, next: Next
 
     await ParticipantService.leaveAsParticipant(meetingId, req.user!.userId);
     res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const searchParticipants = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const meetingId = parseInt(req.params.meetingId);
+    const query = req.query.query as string;
+    const limitParam = req.query.limit as string;
+
+    if (isNaN(meetingId)) {
+      return res.status(400).json({ message: 'Invalid meeting ID' });
+    }
+
+    // Validate query parameters
+    if (!query || query.trim().length === 0) {
+      return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    if (query.trim().length < 2) {
+      return res.status(400).json({ message: 'Search query must be at least 2 characters' });
+    }
+
+    if (query.length > 100) {
+      return res.status(400).json({ message: 'Search query too long (max 100 characters)' });
+    }
+
+    const limit = Math.min(parseInt(limitParam) || 10, 50);
+
+    const users = await ParticipantService.searchParticipants(
+      meetingId,
+      req.user!.userId,
+      query.trim(),
+      limit
+    );
+
+    res.json({ users });
   } catch (err) {
     next(err);
   }

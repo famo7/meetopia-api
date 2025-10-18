@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { ParticipantService } from '../services/participantService';
 import { AddParticipantRequest } from '../validations/Participant';
-import { SearchParticipantsRequest } from '../validations/Search';
 
 export const getParticipants = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

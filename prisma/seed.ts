@@ -190,6 +190,7 @@ async function main() {
       priority: 'HIGH',
       dueDate: nextWeek,
       meetingId: meeting1.id,
+      createdById: user1.id,
       assignedById: user1.id,
       assignedToId: user3.id
     }
@@ -203,6 +204,7 @@ async function main() {
       priority: 'MEDIUM',
       dueDate: nextWeek,
       meetingId: meeting1.id,
+      createdById: user1.id,
       assignedById: user1.id,
       assignedToId: user2.id
     }
@@ -216,6 +218,7 @@ async function main() {
       priority: 'HIGH',
       dueDate: nextWeek,
       meetingId: meeting1.id,
+      createdById: user1.id,
       assignedById: user1.id,
       assignedToId: user1.id // Self-assigned
     }
@@ -230,6 +233,7 @@ async function main() {
       priority: 'MEDIUM',
       dueDate: twoWeeks,
       meetingId: meeting2.id,
+      createdById: user2.id,
       assignedById: user2.id,
       assignedToId: user3.id
     }
@@ -243,6 +247,7 @@ async function main() {
       priority: 'LOW',
       dueDate: twoWeeks,
       meetingId: meeting2.id,
+      createdById: user2.id,
       assignedById: user2.id,
       assignedToId: user1.id
     }
@@ -256,6 +261,7 @@ async function main() {
       priority: 'HIGH',
       dueDate: nextWeek,
       meetingId: meeting2.id,
+      createdById: user2.id,
       assignedById: user2.id,
       assignedToId: user2.id // Self-assigned
     }
@@ -270,6 +276,7 @@ async function main() {
       priority: 'HIGH',
       dueDate: nextWeek,
       meetingId: meeting6.id,
+      createdById: user3.id,
       assignedById: user3.id,
       assignedToId: user1.id
     }
@@ -283,6 +290,7 @@ async function main() {
       priority: 'MEDIUM',
       dueDate: nextWeek,
       meetingId: meeting6.id,
+      createdById: user3.id,
       assignedById: user3.id,
       assignedToId: user2.id
     }
@@ -296,6 +304,7 @@ async function main() {
       priority: 'MEDIUM',
       dueDate: nextWeek,
       meetingId: meeting6.id,
+      createdById: user3.id,
       assignedById: user3.id,
       assignedToId: user3.id // Self-assigned
     }
@@ -309,6 +318,7 @@ async function main() {
       priority: 'LOW',
       dueDate: twoWeeks,
       meetingId: meeting6.id,
+      createdById: user3.id,
       assignedById: user3.id,
       assignedToId: user1.id
     }

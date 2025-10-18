@@ -37,7 +37,8 @@ export class ActionItemService {
         assignedToId: data.assignedToId ?? userId,
         status: 'OPEN',
         priority: data.priority || 'MEDIUM',
-        dueDate: data.dueDate ? new Date(data.dueDate) : null
+        dueDate: data.dueDate ? new Date(data.dueDate) : null,
+        createdById: userId
       },
       include: {
         assignedBy: { select: USER_SELECT },
@@ -133,7 +134,36 @@ export class ActionItemService {
   }
 
   static async deleteActionItem(meetingId: number, actionItemId: number, userId: number) {
-    console.log('Delete action item called');
-    console.log(`Meeting ID: ${meetingId}, Action Item ID: ${actionItemId}, User ID: ${userId}`);
+    // Verify user has access to this meeting
+    const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
+    if (!meeting) {
+      throw { status: 404, message: "Meeting not found" };
+    }
+
+    // Find the action item and ensure it belongs to the meeting
+    const existingActionItem = await prisma.actionItem.findFirst({
+      where: {
+        id: actionItemId,
+        meetingId: meetingId
+      }
+    });
+
+    if (!existingActionItem) {
+      throw { status: 404, message: "Action item not found" };
+    }
+
+    // Only the creator of the action item (assignedById) can delete it
+    if (existingActionItem.createdById !== userId) {
+      throw { status: 403, message: "Only the creator of the action item can delete it" };
+    }
+
+    // Delete and return deleted record (include related users)
+    const deleted = await prisma.actionItem.delete({
+      where: { id: actionItemId },
+      include: ACTION_ITEM_INCLUDE
+    });
+
+    return deleted;
   }
 }

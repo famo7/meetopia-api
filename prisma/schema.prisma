@@ -15,10 +15,11 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  createdMeetings   Meeting[]     @relation("UserCreatedMeetings")
-  participants      Participant[]
-  assignedActions   ActionItem[]  @relation("AssignedByUser")
-  assignedToActions ActionItem[]  @relation("AssignedToUser")
+  createdMeetings    Meeting[]     @relation("UserCreatedMeetings")
+  participants       Participant[]
+  createdActionItems ActionItem[]  @relation("CreatedByUser")
+  assignedActions    ActionItem[]  @relation("AssignedByUser")
+  assignedToActions  ActionItem[]  @relation("AssignedToUser")
 
   @@index([name, email], map: "idx_users_name_email")
   @@index([email], map: "idx_users_email")
@@ -70,9 +71,11 @@ model ActionItem {
   updatedAt   DateTime         @updatedAt
 
   meetingId    Int
+  createdById  Int
   assignedById Int
   assignedToId Int
 
+  createdBy  User    @relation("CreatedByUser", fields: [createdById], references: [id])
   assignedTo User    @relation("AssignedToUser", fields: [assignedToId], references: [id])
   assignedBy User    @relation("AssignedByUser", fields: [assignedById], references: [id])
   meeting    Meeting @relation(fields: [meetingId], references: [id])

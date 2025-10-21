@@ -50,21 +50,18 @@ export class ActionItemService {
   }
 
   static async updateActionItem(meetingId: number, actionItemId: number, userId: number, data: UpdateActionItemRequest) {
-    // First, check if user has access to this meeting
+
     const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
+
 
     if (!meeting) {
       throw { status: 404, message: "Meeting not found" };
     }
 
-    // Get the existing action item
     const existingActionItem = await prisma.actionItem.findFirst({
       where: {
         id: actionItemId,
         meetingId: meetingId
-      },
-      include: {
-        meeting: { select: { creatorId: true } }
       }
     });
 
@@ -72,57 +69,24 @@ export class ActionItemService {
       throw { status: 404, message: "Action item not found" };
     }
 
-    const isAssignedUser = existingActionItem.assignedToId === userId;
-    const isMeetingCreator = existingActionItem.meeting.creatorId === userId;
+    if (data.assignedToId !== undefined) {
+      const assignedToUser = await prisma.user.findUnique({
+        where: { id: data.assignedToId },
+        select: { id: true }
+      });
 
-    if (!isAssignedUser && !isMeetingCreator) {
-      throw { status: 403, message: "Not authorized to update this action item" };
+      if (!assignedToUser) {
+        throw { status: 400, message: "Assigned user not found" };
+      }
     }
 
     const updateData: any = {};
-
-    if (isAssignedUser && !isMeetingCreator) {
-      if (data.status !== undefined) {
-        updateData.status = data.status;
-      }
-
-      if (data.assignedToId !== undefined) {
-        const assignedToUser = await prisma.user.findUnique({
-          where: { id: data.assignedToId },
-          select: { id: true }
-        });
-
-        if (!assignedToUser) {
-          throw { status: 400, message: "Assigned user not found" };
-        }
-
-        updateData.assignedToId = data.assignedToId;
-      }
-
-      if (data.title !== undefined || data.description !== undefined || data.dueDate !== undefined || data.priority !== undefined) {
-        throw { status: 403, message: "Assigned user can only update status and reassign" };
-      }
-    }
-
-    if (isMeetingCreator) {
-      if (data.title !== undefined) updateData.title = data.title;
-      if (data.description !== undefined) updateData.description = data.description;
-      if (data.status !== undefined) updateData.status = data.status;
-      if (data.dueDate !== undefined) updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
-
-      if (data.assignedToId !== undefined) {
-        const assignedToUser = await prisma.user.findUnique({
-          where: { id: data.assignedToId },
-          select: { id: true }
-        });
-
-        if (!assignedToUser) {
-          throw { status: 400, message: "Assigned user not found" };
-        }
-
-        updateData.assignedToId = data.assignedToId;
-      }
-    }
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.priority !== undefined) updateData.priority = data.priority;
+    if (data.dueDate !== undefined) updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
+    if (data.assignedToId !== undefined) updateData.assignedToId = data.assignedToId;
 
     const updatedActionItem = await prisma.actionItem.update({
       where: { id: actionItemId },
@@ -134,14 +98,16 @@ export class ActionItemService {
   }
 
   static async deleteActionItem(meetingId: number, actionItemId: number, userId: number) {
-    // Verify user has access to this meeting
+
     const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
 
+    console.log(`🔍 MEETING ACCESS RESULT:`, meeting ? '✅ ACCESS GRANTED' : '❌ ACCESS DENIED');
+
     if (!meeting) {
+      console.log(`❌ SECURITY VIOLATION: User ${userId} attempted to delete action item ${actionItemId} from meeting ${meetingId} without access`);
       throw { status: 404, message: "Meeting not found" };
     }
 
-    // Find the action item and ensure it belongs to the meeting
     const existingActionItem = await prisma.actionItem.findFirst({
       where: {
         id: actionItemId,
@@ -153,12 +119,6 @@ export class ActionItemService {
       throw { status: 404, message: "Action item not found" };
     }
 
-    // Only the creator of the action item (assignedById) can delete it
-    if (existingActionItem.createdById !== userId) {
-      throw { status: 403, message: "Only the creator of the action item can delete it" };
-    }
-
-    // Delete and return deleted record (include related users)
     const deleted = await prisma.actionItem.delete({
       where: { id: actionItemId },
       include: ACTION_ITEM_INCLUDE

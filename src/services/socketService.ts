@@ -63,7 +63,9 @@ export class SocketService {
 
       // Join the socket room
       socket.join(meetingId);
-      console.log(`✅ User ${userName} (${userId}) joined meeting room ${meetingId}`);
+      // 📢 NEW: Join user to their personal notification room
+      socket.join(`user-${userId}`);
+      console.log(`✅ User ${userName} (${userId}) joined meeting room ${meetingId} and notification room user-${userId}`);
 
       // Initialize room if it doesn't exist
       if (!this.meetingRooms[meetingId]) {
@@ -285,5 +287,13 @@ export class SocketService {
   // Helper method to get IO instance if needed
   public getIO(): SocketIOServer {
     return this.io;
+  }
+
+  // 📢 UTILITY METHODS
+
+  // Send message to specific user's room
+  public sendToUser(userId: number, event: string, data: any) {
+    this.io.to(`user-${userId}`).emit(event, data);
+    console.log(`📤 Sent ${event} to user ${userId}`);
   }
 }

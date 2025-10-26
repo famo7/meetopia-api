@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import { ParticipantService } from '../services/participantService';
 import { AddParticipantRequest } from '../validations/Participant';
+import { NotificationService } from '../services/notificationService';
+import { MeetingService } from '../services/meetingService';
 
 export const getParticipants = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
@@ -27,6 +29,19 @@ export const addParticipant = async (req: Request<{ meetingId: string }, {}, Add
     }
 
     const participant = await ParticipantService.addParticipant(meetingId, req.user!.userId, req.body);
+    
+    const notificationService = NotificationService.getInstance();
+    const meeting = await MeetingService.getUserMeetingById(meetingId, req.user!.userId);
+    
+    if (meeting && req.body.userId !== req.user!.userId) {
+      await notificationService.sendNotificationToUser(req.body.userId, {
+        type: 'PARTICIPANT_ADDED',
+        title: 'Added to Meeting',
+        message: `You have been added to meeting: ${meeting.title}`,
+        data: { meetingId, meetingTitle: meeting.title, type: 'meeting' }
+      });
+    }
+    
     res.status(201).json({ message: 'Participant added successfully', participant });
   } catch (err) {
     next(err);
@@ -74,7 +89,6 @@ export const searchParticipants = async (req: AuthRequest, res: Response, next: 
       return res.status(400).json({ message: 'Invalid meeting ID' });
     }
 
-    // Validate query parameters
     if (!query || query.trim().length === 0) {
       return res.status(400).json({ message: 'Search query is required' });
     }

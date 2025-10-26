@@ -9,17 +9,16 @@ import dashboardRoutes from './routes/dashboardRoutes';
 import { globalLimiter } from './middleware/ratelimit';
 import { errorHandler } from './middleware/errorHandler';
 import { SocketService } from './services/socketService';
+import { NotificationService } from './services/notificationService';
+import notificationRoutes from './routes/notificationRoutes';
 
 const app = express();
 const port = 3000;
 
-// Create HTTP server
 const httpServer = createServer(app);
 
-// Initialize Socket.io
 const socketService = new SocketService(httpServer);
-console.log('🔌 Socket.io initialized');
-
+const notificationService = NotificationService.initialize(socketService);
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -31,11 +30,14 @@ app.use(cookieParser());
 app.use(globalLimiter);
 app.use(express.json());
 
-// Routes
+app.set('notificationService', notificationService);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/meetings', meetingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use(errorHandler);
+
 httpServer.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
   console.log(`📡 WebSocket server ready for connections`);

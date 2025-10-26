@@ -15,11 +15,12 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  createdMeetings    Meeting[]     @relation("UserCreatedMeetings")
+  createdMeetings    Meeting[]      @relation("UserCreatedMeetings")
   participants       Participant[]
-  createdActionItems ActionItem[]  @relation("CreatedByUser")
-  assignedActions    ActionItem[]  @relation("AssignedByUser")
-  assignedToActions  ActionItem[]  @relation("AssignedToUser")
+  createdActionItems ActionItem[]   @relation("CreatedByUser")
+  assignedActions    ActionItem[]   @relation("AssignedByUser")
+  assignedToActions  ActionItem[]   @relation("AssignedToUser")
+  userNotifications  Notification[] @relation("UserNotifications")
 
   @@index([name, email], map: "idx_users_name_email")
   @@index([email], map: "idx_users_email")
@@ -92,6 +93,25 @@ model MeetingNote {
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }
 
+model Notification {
+  id        Int              @id @default(autoincrement())
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  userId      Int
+  relatedId   Int?
+  relatedType String?
+
+  user User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
 enum ParticipantRole {
   PARTICIPANT
   CREATOR
@@ -114,4 +134,16 @@ enum Priority {
   LOW
   MEDIUM
   HIGH
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  PARTICIPANT_ADDED
+  ACTION_ITEM_ASSIGNED
+  ACTION_ITEM_UPDATED
+  MEETING_UPDATED
+  MEETING_REMINDER
 }

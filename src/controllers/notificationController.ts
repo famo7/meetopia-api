@@ -23,9 +23,39 @@ export const markAllAsRead = async (req: AuthRequest, res: Response, next: NextF
     const notificationService = NotificationService.getInstance();
     await notificationService.markNotificationsAsRead(req.user!.userId);
     
-    res.json({ 
+    res.json({
       success: true,
-      message: 'All notifications marked as read' 
+      message: 'All notifications marked as read'
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const markNotificationAsRead = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const notificationId = parseInt(req.params.notificationId);
+    
+    if (isNaN(notificationId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid notification ID'
+      });
+    }
+
+    const notificationService = NotificationService.getInstance();
+    const result = await notificationService.markNotificationAsRead(req.user!.userId, notificationId);
+    
+    if (result.count === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Notification not found or already read'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Notification marked as read'
     });
   } catch (err) {
     next(err);

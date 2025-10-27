@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth';
-import { getNotifications, markAllAsRead, getNotificationCount } from '../controllers/notificationController';
+import { getNotifications, markAllAsRead, getNotificationCount, markNotificationAsRead } from '../controllers/notificationController';
 import { isAuthenticated } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -25,5 +25,11 @@ router.patch('/mark-all-read', markAllAsRead);
  * Get unread notification count for the authenticated user
  */
 router.get('/count', getNotificationCount);
+
+/**
+ * PATCH /api/notifications/:notificationId/read
+ * Mark a specific notification as read for the authenticated user
+ */
+router.patch('/:notificationId/read', markNotificationAsRead);
 
 export default router;

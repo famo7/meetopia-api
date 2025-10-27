@@ -101,7 +101,6 @@ export class ActionItemService {
 
     const meeting = await MeetingService.getUserMeetingById(meetingId, userId);
 
-    console.log(`🔍 MEETING ACCESS RESULT:`, meeting ? '✅ ACCESS GRANTED' : '❌ ACCESS DENIED');
 
     if (!meeting) {
       console.log(`❌ SECURITY VIOLATION: User ${userId} attempted to delete action item ${actionItemId} from meeting ${meetingId} without access`);

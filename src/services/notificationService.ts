@@ -37,7 +37,7 @@ export class NotificationService {
         type: notification.type as any,
         title: notification.title,
         message: notification.message,
-        relatedId: notification.data?.id,
+        relatedId: notification.data?.meetingId,
         relatedType: notification.data?.type
       }
     });
@@ -65,12 +65,12 @@ export class NotificationService {
 
   async markNotificationsAsRead(userId: number) {
     const result = await prisma.notification.updateMany({
-      where: { 
-        userId, 
-        isRead: false 
-        },
-        data: { isRead: true }
-      });
+      where: {
+        userId,
+        isRead: false
+      },
+      data: { isRead: true }
+    });
 
     return result;
   }
@@ -80,8 +80,8 @@ export class NotificationService {
       where: {
         userId,
         isRead: false
-        }
-      });
+      }
+    });
 
     return count;
   }

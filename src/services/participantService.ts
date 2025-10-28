@@ -163,32 +163,25 @@ export class ParticipantService {
         throw { status: 404, message: "Meeting not found or access denied" };
       }
 
-      // Get existing participant IDs and meeting creator to exclude them from search
       const existingParticipants = await prisma.participant.findMany({
         where: { meetingId },
         select: { userId: true }
       });
 
-      // Meeting creator is already in meeting, so exclude them too
       const excludeUserIds = [
         ...existingParticipants.map(p => p.userId),
         meeting.creatorId
       ];
 
-      // Smart search: prioritize startsWith over contains for better precision
       const users = await prisma.user.findMany({
         where: {
           AND: [
             { id: { notIn: excludeUserIds } },
             {
               OR: [
-                // Priority 1: Name starts with query (most relevant)
                 { name: { startsWith: query, mode: 'insensitive' } },
-                // Priority 2: Email starts with query
                 { email: { startsWith: query, mode: 'insensitive' } },
-                // Priority 3: Name contains query (for longer names)
                 { name: { contains: query, mode: 'insensitive' } },
-                // Priority 4: Email contains query (fallback)
                 { email: { contains: query, mode: 'insensitive' } }
               ]
             }
@@ -197,7 +190,6 @@ export class ParticipantService {
         select: USER_SELECT,
         take: limit,
         orderBy: [
-          // Prioritize startsWith matches by sorting name first
           { name: 'asc' },
           { email: 'asc' }
         ]

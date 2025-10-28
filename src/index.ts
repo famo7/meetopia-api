@@ -31,6 +31,7 @@ app.use(globalLimiter);
 app.use(express.json());
 
 app.set('notificationService', notificationService);
+app.set('socketService', socketService);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/meetings', meetingRoutes);
@@ -39,6 +40,5 @@ app.use('/api/notifications', notificationRoutes);
 app.use(errorHandler);
 
 httpServer.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-  console.log(`📡 WebSocket server ready for connections`);
+
 });

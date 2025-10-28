@@ -36,6 +36,12 @@ export class SocketService {
   private initialize() {
     this.io.on('connection', (socket: Socket) => {
 
+      socket.on('identify', (data: { userId?: number | string }) => {
+        const uid = Number((data as any)?.userId);
+        socket.join(`user-${uid}`);
+        (socket as any).userId = uid;
+      });
+
       socket.on('join-meeting', (data) => this.handleJoinMeeting(socket, data));
       socket.on('leave-meeting', (data) => this.handleLeaveMeeting(socket, data));
       socket.on('update-notes', (data) => this.handleUpdateNotes(socket, data));
@@ -133,11 +139,7 @@ export class SocketService {
   }
 
   private async handleSaveNotes(socket: Socket, data: { meetingId: string; content: string }) {
-    console.log('📥 save-notes event:', {
-      meetingId: data.meetingId,
-      contentLength: data.content?.length
-    });
-
+    
     const { meetingId, content } = data;
 
     try {
@@ -178,7 +180,6 @@ export class SocketService {
         }
       }
     } catch (error) {
-      console.error('Error in handleDisconnect:', error);
     }
   }
 

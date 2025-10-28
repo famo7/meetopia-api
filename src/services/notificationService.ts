@@ -43,14 +43,21 @@ export class NotificationService {
     });
 
     this.socketService.sendToUser(userId, 'notification', {
-      ...notification,
       id: dbNotification.id,
+      type: dbNotification.type,
+      title: dbNotification.title,
+      message: dbNotification.message,
+      isRead: false,
       createdAt: dbNotification.createdAt,
-      read: false
+      updatedAt: dbNotification.updatedAt,
+      userId: dbNotification.userId,
+      relatedId: dbNotification.relatedId,
+      relatedType: dbNotification.relatedType
     });
 
     return dbNotification;
   }
+
 
   async getUserNotifications(userId: number, limit = 50, offset = 0) {
     const notifications = await prisma.notification.findMany({

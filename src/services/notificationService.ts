@@ -105,4 +105,27 @@ export class NotificationService {
 
     return notification;
   }
+
+  async markNotificationAsUnRead(userId: number, notificationId: number) {
+    const notification = await prisma.notification.updateMany({
+      where: {
+        id: notificationId,
+        userId: userId,
+        isRead: true
+      },
+      data: { isRead: false }
+    });
+
+    return notification;
+  }
+
+  async removeAllNotifications(userId: number) {
+    const result = await prisma.notification.deleteMany({
+      where: {
+        userId: userId
+      }
+    });
+
+    return result;
+  }
 }

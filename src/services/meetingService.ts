@@ -13,7 +13,7 @@ export class MeetingService {
       where: getUserAccessCondition(userId),
       include: MEETING_INCLUDE,
       orderBy: {
-        date: 'desc'
+        startTime: 'desc'
       }
     });
   }
@@ -33,7 +33,8 @@ export class MeetingService {
       data: {
         title: data.title,
         description: data.description,
-        date: new Date(data.date),
+        startTime: new Date(data.startTime),
+        endTime: data.endTime ? new Date(data.endTime) : null,
         creatorId: userId
       }
     });
@@ -56,7 +57,8 @@ export class MeetingService {
       const updateData: any = {};
       if (data.title !== undefined) updateData.title = data.title;
       if (data.description !== undefined) updateData.description = data.description;
-      if (data.date !== undefined) updateData.date = new Date(data.date);
+      if (data.startTime !== undefined) updateData.startTime = new Date(data.startTime);
+      if (data.endTime !== undefined) updateData.endTime = data.endTime ? new Date(data.endTime) : null;
       if (data.status !== undefined) updateData.status = data.status;
 
       return await prisma.meeting.update({

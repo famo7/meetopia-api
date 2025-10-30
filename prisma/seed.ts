@@ -55,7 +55,8 @@ async function main() {
     data: {
       title: 'Daily Standup',
       description: 'Daily team standup meeting',
-      date: today,
+      startTime: today,
+      endTime: new Date(today.getTime() + 60 * 60 * 1000), // +1 hour
       status: 'SCHEDULED',
       creatorId: user1.id
     }
@@ -65,7 +66,8 @@ async function main() {
     data: {
       title: 'Project Planning',
       description: 'Planning session for new features',
-      date: tomorrow,
+      startTime: tomorrow,
+      endTime: new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000), // +2 hours
       status: 'SCHEDULED',
       creatorId: user2.id
     }
@@ -78,7 +80,8 @@ async function main() {
     data: {
       title: 'Sprint Retrospective',
       description: 'End of sprint retrospective meeting',
-      date: yesterday,
+      startTime: yesterday,
+      endTime: new Date(yesterday.getTime() + 90 * 60 * 1000), // +1.5 hours
       status: 'ENDED',
       creatorId: user1.id
     }
@@ -91,7 +94,8 @@ async function main() {
     data: {
       title: 'Client Presentation',
       description: 'Cancelled due to client unavailability',
-      date: lastWeek,
+      startTime: lastWeek,
+      endTime: new Date(lastWeek.getTime() + 60 * 60 * 1000), // +1 hour
       status: 'CANCELLED',
       creatorId: user2.id
     }
@@ -101,7 +105,8 @@ async function main() {
     data: {
       title: 'Team Brainstorming',
       description: 'Active brainstorming session in progress',
-      date: tomorrow,
+      startTime: tomorrow,
+      endTime: new Date(tomorrow.getTime() + 3 * 60 * 60 * 1000), // +3 hours
       status: 'ACTIVE',
       creatorId: user3.id
     }
@@ -111,7 +116,8 @@ async function main() {
     data: {
       title: 'Collaborative Workshop',
       description: 'Active workshop with all team members',
-      date: today,
+      startTime: today,
+      endTime: new Date(today.getTime() + 4 * 60 * 60 * 1000), // +4 hours
       status: 'ACTIVE',
       creatorId: user3.id
     }

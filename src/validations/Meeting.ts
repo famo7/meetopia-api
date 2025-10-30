@@ -10,7 +10,7 @@ export const CreateMeetingSchema = z.object({
     .optional()
     .default(''),
 
-  date: z.coerce.date()
+  startTime: z.coerce.date()
     .refine((meetingDate) => {
       const now = new Date()
       // Allow meetings to be scheduled at least 5 minutes from now
@@ -18,7 +18,10 @@ export const CreateMeetingSchema = z.object({
       return meetingDate >= minTime
     }, {
       message: 'Meeting must be scheduled at least 5 minutes from now'
-    })
+    }),
+
+  endTime: z.coerce.date()
+    .optional()
 });
 
 export const UpdateMeetingSchema = z.object({
@@ -31,7 +34,10 @@ export const UpdateMeetingSchema = z.object({
     .max(1000, 'Description must be less than 1000 characters')
     .optional(),
 
-  date: z.coerce.date()
+  startTime: z.coerce.date()
+    .optional(),
+
+  endTime: z.coerce.date()
     .optional(),
 
   status: z.enum(['SCHEDULED', 'ACTIVE', 'ENDED', 'CANCELLED'])

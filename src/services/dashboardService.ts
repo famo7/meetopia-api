@@ -23,7 +23,7 @@ export class DashboardService {
       const todaysMeetings = await prisma.meeting.findMany({
         where: {
           ...userAccessCondition,
-          date: {
+          startTime: {
             gte: startOfToday,
             lte: endOfToday
           }
@@ -43,7 +43,7 @@ export class DashboardService {
           }
         },
         orderBy: {
-          date: 'asc'
+          startTime: 'asc'
         }
       });
 
@@ -51,7 +51,7 @@ export class DashboardService {
       const thisWeekMeetingsCount = await prisma.meeting.count({
         where: {
           ...userAccessCondition,
-          date: {
+          startTime: {
             gte: startOfWeek,
             lte: endOfWeek
           }
@@ -62,7 +62,7 @@ export class DashboardService {
       const upcomingMeetings = await prisma.meeting.findMany({
         where: {
           ...userAccessCondition,
-          date: {
+          startTime: {
             gt: endOfToday
           },
           status: {
@@ -84,7 +84,7 @@ export class DashboardService {
           }
         },
         orderBy: {
-          date: 'asc'
+          startTime: 'asc'
         },
         take: 5
       });
@@ -103,7 +103,7 @@ export class DashboardService {
             select: {
               id: true,
               title: true,
-              date: true,
+              startTime: true,
               status: true
             }
           },
